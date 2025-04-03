@@ -2,14 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
+	"myapp/Routes"
 )
 
 func main() {
-    r := gin.Default()
-    r.GET("/", func(c *gin.Context) {
-        c.JSON(200, gin.H{"message": "Hello, World!"})
-    })
-	//fmt.Println("hello word")
-    r.Run()
+	r := Routes.SetupRouter()
+    fmt.Println("Server is running on port 8080")
+    r.Run(":8080")
 }
