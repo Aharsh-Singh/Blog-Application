@@ -9,4 +9,4 @@ This is a simple in-memory blog application built using the **Go Gin** framework
 
 ## API Documentation
 You can find the full API documentation here:  
-📄 **[API Documentation](https://your-api-docs-link.com)**  
+📄 **[API Documentation](https://documenter.getpostman.com/view/43713645/2sB2cShPYk)**  
