@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"myapp/Routes"
+	"myapp/routes"
 	"github.com/joho/godotenv"
 	"log"
 	"myapp/models"
@@ -17,7 +17,7 @@ func init() {
 func main() {
 	db := config.ConnectDatabase()
 	db.AutoMigrate(&models.User{})
-	r := Routes.SetupRouter()
+	r := routes.SetupRouter()
     fmt.Println("Server is running on port 8080")
     r.Run(":8080")
 }
