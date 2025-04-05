@@ -4,37 +4,51 @@ import (
 	"net/http"
 	"myapp/models"
 	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
+	"os"
+	authgo "github.com/supabase-community/auth-go"
 )
 
 func UserRegister(context *gin.Context){
-	user := models.User{}
+	var requestBody struct {
+		Name     string `json:"name"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
 
-	if err := context.ShouldBindJSON(&user); err != nil {
+	if err := context.ShouldBindJSON(&requestBody); err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	existingUser := models.User{}
-	if err := models.DB.Where("email = ?", user.Email).First(&existingUser).Error; err == nil {
-		context.JSON(http.StatusBadRequest, gin.H{"error": "Email already registered"})
-		return
-	}
-	
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
+	projectReference := os.Getenv("PROJECT_REFERENCE")
+	apiKey := os.Getenv("API_KEY")
+
+	client := authgo.New(projectReference, apiKey)
+
+	resp, err := client.Signup(authgo.SignupRequest{
+		Email:    requestBody.Email,
+		Password: requestBody.Password,
+	})
+
 	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"error": "Error in hashing password"})
+		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	user.Password = string(hashedPassword)
+
+	user := models.User{
+		Supabase_ID:    resp.User.ID.String(),
+		Email: resp.User.Email,
+		Name:  requestBody.Name,
+	}
 
 	if err := models.DB.Create(&user).Error; err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to store user"})
 		return
 	}
-
-	context.JSON(http.StatusCreated, gin.H{
-		"message": "User registered successfully",
-		"user":    user,
+	context.JSON(http.StatusOK, gin.H{
+		"message":       "Sign up successful!",
+		"access_token":  resp.AccessToken,
+		"refresh_token": resp.RefreshToken,
+		"user":          user,
 	})
 }
