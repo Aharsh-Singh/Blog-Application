@@ -16,7 +16,7 @@ func init() {
 
 func main() {
 	db := config.ConnectDatabase()
-	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(&models.User{}, &models.Blog{})
 	r := routes.SetupRouter()
     fmt.Println("Server is running on port 8080")
     r.Run(":8080")

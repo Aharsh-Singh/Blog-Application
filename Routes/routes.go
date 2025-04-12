@@ -10,16 +10,25 @@ func SetupRouter() *gin.Engine {
 	r := gin.Default()
 	api := r.Group("/api")
 	{
-		api.GET("blogs", controllers.GetBlog)
-		api.POST("blogs", controllers.CreateBlog)
-		api.GET("blogs/:blogId", controllers.GetABlog)
-		api.PATCH("blogs/:blogId", controllers.UpdateABlog)
-		api.DELETE("blogs/:blogId", controllers.DeleteBlog)
-	}
-	auth := r.Group("/auth")
-	{
-		auth.POST("signup", authController.UserRegister)
-		auth.POST("login", authController.Login)
+		users := api.Group("/users")
+		{
+			users.GET("/get_users", controller.GetAllUsers)
+		}
+
+		blogs := api.Group("/blogs")
+		{
+			blogs.GET("get_blogs/:userId", controller.GetBlog)
+			blogs.POST("write/:userId", controller.CreateBlog)
+			blogs.GET("get_blog/:blogId", controller.GetABlog)
+			blogs.PATCH("update/:blogId", controller.UpdateABlog)
+			blogs.DELETE("delete/:blogId", controller.DeleteBlog)
+		}
+
+		auth := api.Group("/auth")
+		{
+			auth.POST("signup", authController.UserRegister)
+			auth.POST("login", authController.Login)
+		}
 	}
 	return r
 }

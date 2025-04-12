@@ -1,13 +1,12 @@
 package auth
 
-import(
+import (
 	"net/http"
-	// "myapp/models"
-	"github.com/gin-gonic/gin"
-	// "golang.org/x/crypto/bcrypt"
-	// "myapp/utils"
-	authgo "github.com/supabase-community/auth-go"
 	"os"
+
+	"github.com/gin-gonic/gin"
+	supabase_auth "github.com/supabase-community/auth-go"
+	"github.com/supabase-community/auth-go/types"
 )
 
 func Login(context *gin.Context){
@@ -24,29 +23,22 @@ func Login(context *gin.Context){
 	projectReference  := os.Getenv("PROJECT_REFERENCE")
 	apiKey := os.Getenv("API_KEY")
 
-	client := authgo.New(
+	client := supabase_auth.New(
         projectReference,
         apiKey,
     )
 
-    resp, err := client.Token(authgo.TokenGrantRequest{
+	resp, err := client.Token(types.TokenRequest{
         GrantType: "password",
         Email: requestBody.Email,
         Password: requestBody.Password,
     })
+
+
     if err != nil {
         context.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
     }
-
-	// Payload := utils.JWTClaims{
-	// 	ID:    user.ID,
-	// }
-	// token, err := utils.GenerateJWT(Payload)
-	// if err != nil {
-	// 	context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
-	// 	return
-	// }
 
 	context.JSON(http.StatusOK, gin.H{
 		"message": "Login successful!",

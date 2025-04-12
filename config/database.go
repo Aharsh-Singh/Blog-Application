@@ -16,7 +16,7 @@ func ConnectDatabase() *gorm.DB {
 		log.Fatal("Failed to connect to database:", err)
 	}
 
-	log.Println("Connected to Aiven PostgreSQL successfully 🚀")
+	log.Println("Connected to Database successfully")
 	models.DB = db
 	return db
 }
